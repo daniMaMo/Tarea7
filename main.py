@@ -16,7 +16,7 @@ class Group:
 
         :return: list of elements
         """
-        values = set([value for value in self.group.values()])
+        values = set([tupla[0] for tupla in self.group.keys()])
         elements = list(values)
         return elements
 
@@ -27,7 +27,7 @@ class Group:
         """
         for value in self.group.values():
             if value not in self.elements():
-                raise ValueError("The operation is not associativity")
+                raise ValueError("The operation is not binary")
         return True
 
     def is_associativity(self):
@@ -52,8 +52,8 @@ class Group:
         for element in self.elements():
             if self.group[(element, identity)] == element \
                     and self.group[(identity, element)] == element:
-                pass
-            elif i < len(self.elements()):
+                continue
+            if i < len(self.elements()):
                 i += 1
                 identity = self.elements()[i]
             else:
@@ -69,11 +69,12 @@ class Group:
         i = 0
         inverse = self.elements()[i]
         while self.group[(element, inverse)] != self.identity():
-            if len(self.elements()):
+            if i <= len(self.elements()):
                 i += 1
                 inverse = self.elements()[i]
             else:
-                return print('there is no inverse')
+                print('there is no inverse')
+                return None
         return inverse
 
     def is_inverse(self):
@@ -82,8 +83,9 @@ class Group:
         :parameter: g: dict Group multiplication table
         """
         inverses = [self.inverse(element) for element in self.elements()]
-        if len(inverses) != len(self.elements()):
+        if len([1 for e in inverses if e is None]) == 0:
             print("There is an element in group such that has not inverse ")
+            return False
         else:
             print(inverses)
             return True
@@ -112,7 +114,7 @@ class Group:
         """
         for key in g.group.keys():
             if self.group[key] == self.group[(key[1], key[0])]:
-                pass
+                continue
             else:
                 return False
         return True
@@ -131,6 +133,7 @@ class Element(Group):
     def __sub__(self, other_element):
         return Element(self.group.group[(self.element, self.group.inverse(other_element.element))], self.group)
 
+
 g = Group({('0', '0'): '0', ('0', '1'): '1', ('0', '2'): '2', ('1', '0'): '1',
            ('1', '1'): '2', ('1', '2'): '0', ('2', '0'): '2', ('2', '1'): '0', ('2', '2'): '1'})
 
@@ -139,13 +142,15 @@ print(g)
 print(g.group)
 a = Element('1', g)
 print('El grupo del elemento a', a.group)
-print(g.elements())
+print('Los elementos del grupo son:', g.elements())
 print(g.elements()[0])
-print(g.identity())
-print(g.order('0'))
-print(g.order('1'))
+print('La intentidad del grupo es:', g.identity())
+print('El orden del elemento 0 es:', g.order('0'))
+print('El orden del elemnto 1 es:', g.order('1'))
+print('Verifiquemos si la operación es binaria', g.is_operation_binary())
+print('Verifiquemos la propiedad asociativa', g.is_associativity())
 print(type(g.identity()))
-print(g.inverse('2'))
+print('El inverso del elemento 2 es:', g.inverse('2'))
 print(g.is_inverse())
 print(g.is_operation_binary())
 p1 = Element('0', g)
